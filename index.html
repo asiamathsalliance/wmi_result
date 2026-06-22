@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WMI — Student Results & Certificate</title>
+<link rel="icon" type="image/png" href="logo-images/wmi-logo.png">
+<link rel="apple-touch-icon" href="logo-images/wmi-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -127,6 +129,9 @@
         </div>
         <div class="carousel-slide peek-right" id="carousel-peek-right" data-dir="1" aria-hidden="true">
           <img id="carousel-img-right" src="" alt="">
+        </div>
+        <div class="carousel-slide peek-enter" id="carousel-enter" aria-hidden="true">
+          <img id="carousel-img-enter" src="" alt="">
         </div>
       </div>
       <button type="button" class="carousel-arrow carousel-arrow-right" id="carousel-next" aria-label="Next winner list">&rsaquo;</button>
@@ -378,21 +383,24 @@
     </div>
 
     <div class="result-actions">
-      <button type="button" class="btn btn-outline" id="download-cert-btn">
-        Certificate
+      <button type="button" class="btn btn-outline dl-btn" id="download-cert-btn">
         <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>
         </svg>
+        <span class="btn-label">Certificate</span>
       </button>
-      <button type="button" class="btn btn-outline" id="download-report-btn">
-        Report
+      <button type="button" class="btn btn-outline dl-btn" id="download-report-btn">
         <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>
         </svg>
+        <span class="btn-label">Report</span>
       </button>
     </div>
   </div>
 </div>
+
+<!-- Toast -->
+<div id="toast" role="status" aria-live="polite"></div>
 
 <!-- Error modal -->
 <div id="errorModal">
@@ -403,6 +411,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

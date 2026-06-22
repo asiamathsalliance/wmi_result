@@ -129,8 +129,9 @@ document.addEventListener('DOMContentLoaded', function () {
     ]);
   }
 
-  function showSpinner() {
+  function showSpinner(overModal) {
     loadingOverlay.style.display = 'flex';
+    loadingOverlay.classList.toggle('over-modal', !!overModal);
     const spinner = loadingOverlay.querySelector('.spinner');
     if (spinner) spinner.style.display = 'flex';
     requestAnimationFrame(() => loadingOverlay.classList.add('active'));
@@ -142,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function resetSpinner() {
-    loadingOverlay.classList.remove('active');
+    loadingOverlay.classList.remove('active', 'over-modal');
     loadingOverlay.style.display = 'none';
     const spinner = loadingOverlay.querySelector('.spinner');
     if (spinner) spinner.style.display = 'none';
@@ -155,10 +156,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function showValidationError(message) {
-    showSpinner();
+    const certOpen = document.getElementById('certModal')?.classList.contains('open');
+    showSpinner(certOpen);
     setTimeout(() => {
       hideSpinnerKeepBackground();
       loadingOverlay.style.display = 'none';
+      loadingOverlay.classList.remove('over-modal');
       showErrorModal(message);
     }, 2000);
   }
@@ -292,6 +295,64 @@ document.addEventListener('DOMContentLoaded', function () {
   const resultModal = document.getElementById('resultModal');
   const downloadCertBtn = document.getElementById('download-cert-btn');
   const downloadReportBtn = document.getElementById('download-report-btn');
+  const toastEl = document.getElementById('toast');
+  let toastTimer = null;
+
+  function showToast(message, duration = 2600) {
+    if (!toastEl) return;
+    toastEl.textContent = message;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toastEl.classList.remove('show');
+    }, duration);
+  }
+
+  function resetDownloadButton(btn, labelText) {
+    btn.classList.remove('loading');
+    const label = btn.querySelector('.btn-label');
+    if (label) label.textContent = labelText;
+  }
+
+  function handleDownload(btn, type) {
+    const isCertificate = type === 'certificate';
+    const url = isCertificate ? tempCertificate : tempReport;
+    const defaultLabel = isCertificate ? 'Certificate' : 'Report';
+    const filename = isCertificate ? 'WMI_Certificate.pdf' : 'WMI_Report.pdf';
+    const label = btn.querySelector('.btn-label');
+
+    if (!url) {
+      showToast(
+        isCertificate ? 'Certificate has not been released yet.' : 'Report has not been released yet.'
+      );
+      return;
+    }
+
+    if (btn.classList.contains('loading')) return;
+
+    btn.classList.add('loading');
+    if (label) label.textContent = 'Downloading…';
+
+    setTimeout(() => {
+      triggerDownload(url, filename);
+      resetDownloadButton(btn, defaultLabel);
+      showToast(isCertificate ? 'Certificate downloaded' : 'Report downloaded', 3500);
+    }, 3500);
+  }
+
+  function playResultConfetti() {
+    if (typeof confetti !== 'function') return;
+
+    setTimeout(() => {
+      confetti({
+        particleCount: 250,
+        spread: 300,
+        origin: { y: 0.55 },
+        ticks: 350,
+        zIndex: 220
+      });
+    });
+  }
 
   function getAwardClass(text) {
     const lower = (text || '').toLowerCase();
@@ -332,35 +393,26 @@ document.addEventListener('DOMContentLoaded', function () {
     awardEl.className = 'result-stat-value ' + getAwardClass(award);
 
     resultModal.classList.add('open');
+    playResultConfetti();
 
     downloadCertBtn.disabled = !tempCertificate;
     downloadReportBtn.disabled = !tempReport;
+    resetDownloadButton(downloadCertBtn, 'Certificate');
+    resetDownloadButton(downloadReportBtn, 'Report');
   }
 
   function closeResultModal() {
     resultModal.classList.remove('open');
+    resetDownloadButton(downloadCertBtn, 'Certificate');
+    resetDownloadButton(downloadReportBtn, 'Report');
+    if (toastEl) toastEl.classList.remove('show');
+    clearTimeout(toastTimer);
   }
 
-  downloadCertBtn.addEventListener('click', () => {
-    if (!tempCertificate) {
-      showErrorModal('Certificate has not been released yet.');
-      return;
-    }
-    triggerDownload(tempCertificate, 'WMI_Certificate.pdf');
-  });
-
-  downloadReportBtn.addEventListener('click', () => {
-    if (!tempReport) {
-      showErrorModal('Report has not been released yet.');
-      return;
-    }
-    triggerDownload(tempReport, 'WMI_Report.pdf');
-  });
+  downloadCertBtn.addEventListener('click', () => handleDownload(downloadCertBtn, 'certificate'));
+  downloadReportBtn.addEventListener('click', () => handleDownload(downloadReportBtn, 'report'));
 
   document.getElementById('close-result-modal').addEventListener('click', closeResultModal);
-  resultModal.addEventListener('click', (e) => {
-    if (e.target === resultModal) closeResultModal();
-  });
 
   async function lookupResult() {
     const firstName = capitalize(document.getElementById('first-name').value.trim());
@@ -386,11 +438,9 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    closeCertModal();
-
     lookupBtn.disabled = true;
     resetSpinner();
-    showSpinner();
+    showSpinner(certModal.classList.contains('open'));
 
     await checkWMIResult(firstName, lastName, dob, grade);
 
@@ -398,6 +448,7 @@ document.addEventListener('DOMContentLoaded', function () {
       setTimeout(() => {
         hideSpinnerKeepBackground();
         loadingOverlay.style.display = 'none';
+        loadingOverlay.classList.remove('over-modal');
         showErrorModal('Server not responding. Please refresh the page.');
         lookupBtn.disabled = false;
       }, 2000);
@@ -408,6 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
       setTimeout(() => {
         hideSpinnerKeepBackground();
         loadingOverlay.style.display = 'none';
+        loadingOverlay.classList.remove('over-modal');
         showErrorModal(lookupMessage || 'Unable to find contestant.');
         lookupBtn.disabled = false;
       }, 2000);
@@ -418,6 +470,7 @@ document.addEventListener('DOMContentLoaded', function () {
       setTimeout(() => {
         hideSpinnerKeepBackground();
         loadingOverlay.style.display = 'none';
+        loadingOverlay.classList.remove('over-modal');
         showErrorModal('Certificate has not been released yet.');
         lookupBtn.disabled = false;
       }, 2000);
@@ -427,6 +480,8 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
       hideSpinnerKeepBackground();
       loadingOverlay.style.display = 'none';
+      loadingOverlay.classList.remove('over-modal');
+      closeCertModal();
       showResultModal(tempStudent);
       lookupBtn.disabled = false;
     }, 2000);
@@ -516,16 +571,49 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // ── Nav active state ──
+  // ── Nav scroll + active state ──
 
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-links a:not(.nav-contact)');
 
-  window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach((s) => {
-      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  function scrollSectionToCenter(section) {
+    const sectionTop = section.offsetTop;
+    const sectionHeight = section.offsetHeight;
+    const viewportHeight = window.innerHeight;
+    const target = sectionTop - (viewportHeight - sectionHeight) / 2;
+    const maxScroll = document.documentElement.scrollHeight - viewportHeight;
+    window.scrollTo({
+      top: Math.max(0, Math.min(target, maxScroll)),
+      behavior: 'smooth'
     });
+  }
+
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+      const section = document.getElementById(href.slice(1));
+      if (!section) return;
+      e.preventDefault();
+      scrollSectionToCenter(section);
+      history.pushState(null, '', href);
+    });
+  });
+
+  window.addEventListener('scroll', () => {
+    const viewportCenter = window.scrollY + window.innerHeight / 2;
+    let current = '';
+    let minDistance = Infinity;
+
+    sections.forEach((s) => {
+      const sectionCenter = s.offsetTop + s.offsetHeight / 2;
+      const distance = Math.abs(sectionCenter - viewportCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        current = s.id;
+      }
+    });
+
     navLinks.forEach((a) => {
       a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent)' : '';
     });
@@ -550,11 +638,25 @@ document.addEventListener('DOMContentLoaded', function () {
   const imgRight = document.getElementById('carousel-img-right');
   const peekLeft = document.getElementById('carousel-peek-left');
   const peekRight = document.getElementById('carousel-peek-right');
-  const activeSlide = document.getElementById('carousel-active');
-  const SLIDE_MS = 500;
+  const enterSlide = document.getElementById('carousel-enter');
+  const imgEnter = document.getElementById('carousel-img-enter');
+  const SLIDE_MS = 320;
 
   function mod(n, m) {
     return ((n % m) + m) % m;
+  }
+
+  function prepEnterSlide(direction) {
+    const incomingIdx = mod(carouselIndex + (direction > 0 ? 2 : -2), winnerImages.length);
+    const incoming = winnerImages[incomingIdx];
+    imgEnter.src = incoming.src;
+    imgEnter.alt = incoming.alt;
+    enterSlide.className =
+      'carousel-slide peek-enter ' + (direction > 0 ? 'peek-enter-right' : 'peek-enter-left');
+  }
+
+  function resetEnterSlide() {
+    enterSlide.className = 'carousel-slide peek-enter';
   }
 
   function renderCarousel() {
@@ -576,33 +678,25 @@ document.addEventListener('DOMContentLoaded', function () {
     carouselIndex = mod(carouselIndex + direction, winnerImages.length);
     carouselViewport.classList.add('no-transition');
     carouselViewport.classList.remove('slide-next', 'slide-prev');
+    resetEnterSlide();
     renderCarousel();
-
-    const enterEl = direction > 0 ? peekRight : peekLeft;
-    const enterClass = direction > 0 ? 'enter-from-right' : 'enter-from-left';
-    enterEl.classList.add(enterClass);
 
     requestAnimationFrame(() => {
       carouselViewport.classList.remove('no-transition');
-      requestAnimationFrame(() => {
-        enterEl.classList.remove(enterClass);
-      });
     });
 
     setTimeout(() => {
       carouselAnimating = false;
-    }, SLIDE_MS + 50);
+    }, SLIDE_MS + 30);
   }
 
   function moveCarousel(direction) {
     if (carouselAnimating) return;
     carouselAnimating = true;
 
-    peekLeft.classList.remove('enter-from-left', 'enter-from-right');
-    peekRight.classList.remove('enter-from-left', 'enter-from-right');
-    activeSlide.classList.remove('enter-from-left', 'enter-from-right');
-
+    prepEnterSlide(direction);
     carouselViewport.classList.remove('slide-next', 'slide-prev');
+    void carouselViewport.offsetWidth;
     carouselViewport.classList.add(direction > 0 ? 'slide-next' : 'slide-prev');
 
     setTimeout(() => finishCarouselSlide(direction), SLIDE_MS);
