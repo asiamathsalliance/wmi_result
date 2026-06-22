@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function openCertModal() {
     certModal.classList.add('open');
+    updateCertModalFieldStyles();
   }
 
   function closeCertModal() {
@@ -96,6 +97,19 @@ document.addEventListener('DOMContentLoaded', function () {
   certModal.addEventListener('click', (e) => {
     if (e.target === certModal) closeCertModal();
   });
+
+  const gradeSelect = document.getElementById('grade');
+  const dobInput = document.getElementById('dob');
+
+  function updateCertModalFieldStyles() {
+    gradeSelect.classList.toggle('is-empty', !gradeSelect.value);
+    dobInput.classList.toggle('is-empty', !dobInput.value);
+  }
+
+  gradeSelect.addEventListener('change', updateCertModalFieldStyles);
+  dobInput.addEventListener('change', updateCertModalFieldStyles);
+  dobInput.addEventListener('input', updateCertModalFieldStyles);
+  updateCertModalFieldStyles();
 
   async function checkWMIResult(firstName, lastName, dob) {
     serverErrorFlag = false;
@@ -275,6 +289,7 @@ document.addEventListener('DOMContentLoaded', function () {
           message.textContent = '';
           progressBar.style.width = '0%';
           document.getElementById('contact-form').reset();
+          updateCategorySelectStyle();
         }, 2000);
       } else {
         progressBar.style.width = progress + '%';
@@ -289,6 +304,19 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
     submitEnquiry();
+  });
+
+  const categorySelect = document.getElementById('c-category');
+
+  function updateCategorySelectStyle() {
+    categorySelect.classList.toggle('is-empty', !categorySelect.value);
+  }
+
+  categorySelect.addEventListener('change', updateCategorySelectStyle);
+  updateCategorySelectStyle();
+
+  document.getElementById('contact-form').addEventListener('reset', () => {
+    setTimeout(updateCategorySelectStyle, 0);
   });
 
   // ── Error modal ──
