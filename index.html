@@ -26,6 +26,7 @@
     <ul class="nav-links">
       <li><a href="#hero">Home</a></li>
       <li><a href="#about">About</a></li>
+      <li><a href="#winners">Winners</a></li>
       <li><a href="#certificate">Results</a></li>
       <li><a href="#contact" class="nav-contact">Contact Us</a></li>
     </ul>
@@ -100,6 +101,35 @@
           <p class="card-desc">Questions designed to be innovative — no inside-the-box thinking here.</p>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- WINNERS -->
+<section id="winners">
+  <div class="section-inner winners-section">
+    <div class="winners-header">
+      <div class="section-eyebrow" style="justify-content:center;"><span class="eyebrow-line"></span> Celebrating Excellence <span class="eyebrow-line"></span></div>
+      <h2 class="section-title">WMI 2026 Winners</h2>
+      <p class="section-body winners-subtext">
+        Congratulations to all winners of the World Mathematics Invitational Preliminary Round 2026.
+      </p>
+    </div>
+
+    <div class="winners-carousel" id="winners-carousel" tabindex="0" aria-label="WMI 2026 winners carousel">
+      <button type="button" class="carousel-arrow carousel-arrow-left" id="carousel-prev" aria-label="Previous winner list">&lsaquo;</button>
+      <div class="carousel-viewport">
+        <div class="carousel-slide peek-left" id="carousel-peek-left" data-dir="-1" aria-hidden="true">
+          <img id="carousel-img-left" src="" alt="">
+        </div>
+        <div class="carousel-slide active" id="carousel-active">
+          <img id="carousel-img-active" src="" alt="">
+        </div>
+        <div class="carousel-slide peek-right" id="carousel-peek-right" data-dir="1" aria-hidden="true">
+          <img id="carousel-img-right" src="" alt="">
+        </div>
+      </div>
+      <button type="button" class="carousel-arrow carousel-arrow-right" id="carousel-next" aria-label="Next winner list">&rsaquo;</button>
     </div>
   </div>
 </section>
@@ -309,6 +339,57 @@
     <p id="downloadLabel">Processing…</p>
     <div class="progress-track">
       <div id="downloadBar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Result stat modal -->
+<div id="resultModal" class="modal-overlay">
+  <div class="modal-box result-modal-box">
+    <button type="button" class="modal-close" id="close-result-modal" aria-label="Close">&times;</button>
+    <h3>Your Result</h3>
+    <p class="modal-desc">Congratulations on completing WMI 2026!</p>
+
+    <div class="result-stats">
+      <div class="result-stat-row">
+        <span class="result-stat-label">Name</span>
+        <span class="result-stat-value" id="rs-name">—</span>
+      </div>
+      <div class="result-stat-row">
+        <span class="result-stat-label">Section A</span>
+        <span class="result-stat-value" id="rs-section-a">—</span>
+      </div>
+      <div class="result-stat-row">
+        <span class="result-stat-label">Section B</span>
+        <span class="result-stat-value" id="rs-section-b">—</span>
+      </div>
+      <div class="result-stat-row">
+        <span class="result-stat-label">Total Score</span>
+        <span class="result-stat-value" id="rs-total">—</span>
+      </div>
+      <div class="result-stat-row">
+        <span class="result-stat-label">Global Ranking</span>
+        <span class="result-stat-value" id="rs-ranking">—</span>
+      </div>
+      <div class="result-stat-row">
+        <span class="result-stat-label">Award</span>
+        <span class="result-stat-value" id="rs-award">—</span>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button type="button" class="btn btn-outline" id="download-cert-btn">
+        Certificate
+        <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>
+        </svg>
+      </button>
+      <button type="button" class="btn btn-outline" id="download-report-btn">
+        Report
+        <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>
+        </svg>
+      </button>
     </div>
   </div>
 </div>

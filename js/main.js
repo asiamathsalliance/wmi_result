@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const BACKEND_BASE_URL = 'https://competition-backend-1-zd68.onrender.com';
 
   let tempCertificate = null;
+  let tempReport = null;
+  let tempStudent = null;
   let serverErrorFlag = false;
   let lookupSuccess = false;
   let lookupMessage = '';
@@ -17,9 +19,102 @@ document.addEventListener('DOMContentLoaded', function () {
   downloadOverlay.style.display = 'none';
   downloadContainer.style.display = 'none';
 
+  function titleCaseName(text) {
+    if (!text || typeof text !== 'string') return '';
+    return text
+      .trim()
+      .replace(/\s+/g, ' ')
+      .toLowerCase()
+      .replace(/(^|[\s\-',])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
+  }
+
   function capitalize(name) {
-    if (!name) return '';
-    return name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+    return titleCaseName(name);
+  }
+
+  function formatDisplayName(student) {
+    if (student.fullName) return titleCaseName(student.fullName);
+    if (student.name) return titleCaseName(student.name);
+    const parts = [student.firstName, student.lastName]
+      .filter(Boolean)
+      .map((part) => titleCaseName(part));
+    return parts.length ? parts.join(' ') : '—';
+  }
+
+  function formatGrade(grade) {
+    if (grade == null || grade === '') return '—';
+    const value = String(grade).trim();
+    const shortMatch = value.match(/^([Kk]|P|S)(\d+)?$/i);
+    if (shortMatch) {
+      return shortMatch[2] ? shortMatch[1].toUpperCase() + shortMatch[2] : shortMatch[1].toUpperCase();
+    }
+    const gradeWordMatch = value.match(/^grade\s+(\d+)$/i);
+    if (gradeWordMatch) return `Grade ${gradeWordMatch[1]}`;
+    if (/^kindergarten$/i.test(value)) return 'Kindergarten';
+    return titleCaseName(value);
+  }
+
+  function formatAward(award) {
+    if (award == null || award === '') return '—';
+    return titleCaseName(String(award).trim().replace(/_/g, ' '));
+  }
+
+  function formatScore(value) {
+    if (value == null || value === '') return '—';
+
+    if (typeof value === 'number' && !Number.isNaN(value)) {
+      return `${value} / 100`;
+    }
+
+    const text = String(value).trim();
+    const outOf100Match = text.match(/^(\d+(?:\.\d+)?)\s*(?:\/|out of)\s*100$/i);
+    if (outOf100Match) return `${outOf100Match[1]} / 100`;
+
+    if (/^\d+(?:\.\d+)?$/.test(text)) {
+      return `${text} / 100`;
+    }
+
+    const fractionMatch = text.match(/^(\d+(?:\.\d+)?)\s*\/\s*\d+(?:\.\d+)?$/);
+    if (fractionMatch) {
+      return `${fractionMatch[1]} / 100`;
+    }
+
+    return text;
+  }
+
+  function formatTotalScore(student) {
+    const rawScore =
+      student.score ??
+      student.totalScore ??
+      student.total ??
+      null;
+
+    let value = rawScore;
+    if (value == null || value === '') {
+      const scoreA = student.scoreA ?? student.sectionA ?? student.section1 ?? student.sectionAScore;
+      const scoreB = student.scoreB ?? student.sectionB ?? student.section2 ?? student.sectionBScore;
+      if (scoreA != null && scoreA !== '' && scoreB != null && scoreB !== '') {
+        const a = Number(scoreA);
+        const b = Number(scoreB);
+        if (!Number.isNaN(a) && !Number.isNaN(b)) value = a + b;
+      }
+    }
+
+    if (value == null || value === '') return '—';
+    if (typeof value === 'number' && !Number.isNaN(value)) return `${value} / 200`;
+
+    const text = String(value).trim();
+    const outOf200Match = text.match(/^(\d+(?:\.\d+)?)\s*(?:\/|out of)\s*200$/i);
+    if (outOf200Match) return `${outOf200Match[1]} / 200`;
+    if (/^\d+(?:\.\d+)?$/.test(text)) return `${text} / 200`;
+
+    return text;
+  }
+
+  function formatRanking(value) {
+    if (value == null || value === '') return '—';
+    const parsed = parseInt(String(value).trim(), 10);
+    return Number.isNaN(parsed) ? '—' : String(parsed);
   }
 
   function getDirectDriveLink(shareLink) {
@@ -111,9 +206,11 @@ document.addEventListener('DOMContentLoaded', function () {
   dobInput.addEventListener('input', updateCertModalFieldStyles);
   updateCertModalFieldStyles();
 
-  async function checkWMIResult(firstName, lastName, dob) {
+  async function checkWMIResult(firstName, lastName, dob, grade) {
     serverErrorFlag = false;
     tempCertificate = null;
+    tempReport = null;
+    tempStudent = null;
     lookupSuccess = false;
     lookupMessage = '';
 
@@ -123,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ firstName, lastName, dob })
+          body: JSON.stringify({ firstName, lastName, dob, grade })
         },
         6000
       );
@@ -138,7 +235,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (result.success && result.student) {
         lookupSuccess = true;
+        tempStudent = result.student;
         tempCertificate = result.student.certificate || '';
+        tempReport =
+          result.student.report ||
+          result.student.reportUrl ||
+          result.student.resultReport ||
+          '';
       } else {
         lookupMessage = result.message || 'Unable to find contestant.';
       }
@@ -147,12 +250,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function downloadCertificate() {
-    downloadOverlay.style.display = 'flex';
-    downloadContainer.style.display = 'flex';
-    const message = document.getElementById('downloadLabel');
-    message.textContent = 'Downloading…';
-    progressBar.style.width = '0%';
+  function runDownloadProgress(labelEl, barEl, certificateUrl, onDone) {
+    labelEl.textContent = 'Downloading certificate…';
+    barEl.style.width = '0%';
 
     let progress = 0;
     const interval = setInterval(() => {
@@ -160,34 +260,113 @@ document.addEventListener('DOMContentLoaded', function () {
       if (progress >= 100) {
         progress = 100;
         clearInterval(interval);
-        progressBar.style.width = '100%';
+        barEl.style.width = '100%';
 
         setTimeout(() => {
-          message.textContent = 'Download Complete!';
+          labelEl.textContent = 'Download complete!';
         }, 300);
 
-        const directLink = getDirectDriveLink(tempCertificate);
+        const directLink = getDirectDriveLink(certificateUrl);
         const link = document.createElement('a');
         link.href = directLink;
         link.download = 'WMI_Certificate.pdf';
         link.click();
 
         setTimeout(() => {
-          downloadOverlay.style.display = 'none';
-          downloadContainer.style.display = 'none';
-          message.textContent = '';
-          progressBar.style.width = '0%';
-        }, 3800);
+          if (onDone) onDone();
+        }, 1500);
       } else {
-        progressBar.style.width = progress + '%';
+        barEl.style.width = progress + '%';
       }
     }, 200);
   }
+
+  function triggerDownload(url, filename) {
+    if (!url) return;
+    const link = document.createElement('a');
+    link.href = getDirectDriveLink(url);
+    link.download = filename;
+    link.click();
+  }
+
+  const resultModal = document.getElementById('resultModal');
+  const downloadCertBtn = document.getElementById('download-cert-btn');
+  const downloadReportBtn = document.getElementById('download-report-btn');
+
+  function getAwardClass(text) {
+    const lower = (text || '').toLowerCase();
+    if (lower.includes('gold')) return 'award-gold';
+    if (lower.includes('silver')) return 'award-silver';
+    if (lower.includes('bronze')) return 'award-bronze';
+    if (lower.includes('merit')) return 'award-merit';
+    if (lower.includes('participation')) return 'award-participation';
+    return '';
+  }
+
+  function showResultModal(student) {
+    const name = formatDisplayName(student);
+    const sectionA = formatScore(
+      student.scoreA ?? student.sectionA ?? student.section1 ?? student.sectionAScore
+    );
+    const sectionB = formatScore(
+      student.scoreB ?? student.sectionB ?? student.section2 ?? student.sectionBScore
+    );
+    const totalScore = formatTotalScore(student);
+    const ranking = formatRanking(
+      student.globalRanking ??
+        student.globalRank ??
+        student.ranking ??
+        student.rank ??
+        student.overallRanking
+    );
+    const award = formatAward(student.result || student.award);
+
+    document.getElementById('rs-name').textContent = name;
+    document.getElementById('rs-section-a').textContent = sectionA;
+    document.getElementById('rs-section-b').textContent = sectionB;
+    document.getElementById('rs-total').textContent = totalScore;
+    document.getElementById('rs-ranking').textContent = ranking;
+
+    const awardEl = document.getElementById('rs-award');
+    awardEl.textContent = award;
+    awardEl.className = 'result-stat-value ' + getAwardClass(award);
+
+    resultModal.classList.add('open');
+
+    downloadCertBtn.disabled = !tempCertificate;
+    downloadReportBtn.disabled = !tempReport;
+  }
+
+  function closeResultModal() {
+    resultModal.classList.remove('open');
+  }
+
+  downloadCertBtn.addEventListener('click', () => {
+    if (!tempCertificate) {
+      showErrorModal('Certificate has not been released yet.');
+      return;
+    }
+    triggerDownload(tempCertificate, 'WMI_Certificate.pdf');
+  });
+
+  downloadReportBtn.addEventListener('click', () => {
+    if (!tempReport) {
+      showErrorModal('Report has not been released yet.');
+      return;
+    }
+    triggerDownload(tempReport, 'WMI_Report.pdf');
+  });
+
+  document.getElementById('close-result-modal').addEventListener('click', closeResultModal);
+  resultModal.addEventListener('click', (e) => {
+    if (e.target === resultModal) closeResultModal();
+  });
 
   async function lookupResult() {
     const firstName = capitalize(document.getElementById('first-name').value.trim());
     const lastName = capitalize(document.getElementById('last-name').value.trim());
     const dob = document.getElementById('dob').value;
+    const grade = gradeSelect.value;
     const lookupBtn = document.getElementById('lookup-btn');
 
     if (!firstName) {
@@ -202,6 +381,10 @@ document.addEventListener('DOMContentLoaded', function () {
       showValidationError('Please enter your birth date.');
       return;
     }
+    if (!grade) {
+      showValidationError('Please select your grade.');
+      return;
+    }
 
     closeCertModal();
 
@@ -209,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
     resetSpinner();
     showSpinner();
 
-    await checkWMIResult(firstName, lastName, dob);
+    await checkWMIResult(firstName, lastName, dob, grade);
 
     if (serverErrorFlag) {
       setTimeout(() => {
@@ -244,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
       hideSpinnerKeepBackground();
       loadingOverlay.style.display = 'none';
-      downloadCertificate();
+      showResultModal(tempStudent);
       lookupBtn.disabled = false;
     }, 2000);
   }
@@ -346,5 +529,115 @@ document.addEventListener('DOMContentLoaded', function () {
     navLinks.forEach((a) => {
       a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent)' : '';
     });
+  });
+
+  // ── Winners carousel ──
+
+  const winnerImages = [
+    { src: 'winner-images/rank_1.png', alt: 'WMI 2026 Gold and Silver winners' },
+    { src: 'winner-images/rank_2.png', alt: 'WMI 2026 Silver winners' },
+    { src: 'winner-images/rank_3.png', alt: 'WMI 2026 Bronze and Merit winners' },
+    { src: 'winner-images/rank_4.png', alt: 'WMI 2026 Merit and Participation winners' },
+    { src: 'winner-images/rank_5.png', alt: 'WMI 2026 Participation winners' }
+  ];
+
+  let carouselIndex = 0;
+  let carouselAnimating = false;
+  const carouselEl = document.getElementById('winners-carousel');
+  const carouselViewport = carouselEl.querySelector('.carousel-viewport');
+  const imgLeft = document.getElementById('carousel-img-left');
+  const imgActive = document.getElementById('carousel-img-active');
+  const imgRight = document.getElementById('carousel-img-right');
+  const peekLeft = document.getElementById('carousel-peek-left');
+  const peekRight = document.getElementById('carousel-peek-right');
+  const activeSlide = document.getElementById('carousel-active');
+  const SLIDE_MS = 500;
+
+  function mod(n, m) {
+    return ((n % m) + m) % m;
+  }
+
+  function renderCarousel() {
+    const prevIdx = mod(carouselIndex - 1, winnerImages.length);
+    const nextIdx = mod(carouselIndex + 1, winnerImages.length);
+    const current = winnerImages[carouselIndex];
+    const prev = winnerImages[prevIdx];
+    const next = winnerImages[nextIdx];
+
+    imgActive.src = current.src;
+    imgActive.alt = current.alt;
+    imgLeft.src = prev.src;
+    imgLeft.alt = prev.alt;
+    imgRight.src = next.src;
+    imgRight.alt = next.alt;
+  }
+
+  function finishCarouselSlide(direction) {
+    carouselIndex = mod(carouselIndex + direction, winnerImages.length);
+    carouselViewport.classList.add('no-transition');
+    carouselViewport.classList.remove('slide-next', 'slide-prev');
+    renderCarousel();
+
+    const enterEl = direction > 0 ? peekRight : peekLeft;
+    const enterClass = direction > 0 ? 'enter-from-right' : 'enter-from-left';
+    enterEl.classList.add(enterClass);
+
+    requestAnimationFrame(() => {
+      carouselViewport.classList.remove('no-transition');
+      requestAnimationFrame(() => {
+        enterEl.classList.remove(enterClass);
+      });
+    });
+
+    setTimeout(() => {
+      carouselAnimating = false;
+    }, SLIDE_MS + 50);
+  }
+
+  function moveCarousel(direction) {
+    if (carouselAnimating) return;
+    carouselAnimating = true;
+
+    peekLeft.classList.remove('enter-from-left', 'enter-from-right');
+    peekRight.classList.remove('enter-from-left', 'enter-from-right');
+    activeSlide.classList.remove('enter-from-left', 'enter-from-right');
+
+    carouselViewport.classList.remove('slide-next', 'slide-prev');
+    carouselViewport.classList.add(direction > 0 ? 'slide-next' : 'slide-prev');
+
+    setTimeout(() => finishCarouselSlide(direction), SLIDE_MS);
+  }
+
+  renderCarousel();
+
+  document.getElementById('carousel-prev').addEventListener('click', () => moveCarousel(-1));
+  document.getElementById('carousel-next').addEventListener('click', () => moveCarousel(1));
+  peekLeft.addEventListener('click', () => moveCarousel(-1));
+  peekRight.addEventListener('click', () => moveCarousel(1));
+
+  carouselEl.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      moveCarousel(-1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      moveCarousel(1);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const modalOpen =
+      certModal.classList.contains('open') ||
+      resultModal.classList.contains('open') ||
+      errorModal.style.display === 'flex';
+    if (modalOpen) return;
+
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const rect = carouselEl.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!inView) return;
+      e.preventDefault();
+      moveCarousel(e.key === 'ArrowLeft' ? -1 : 1);
+    }
   });
 });

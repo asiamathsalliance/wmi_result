@@ -34,7 +34,7 @@ Results are fetched from:
 https://competition-backend-1-zd68.onrender.com/check-wmi-result
 ```
 
-Required fields: `firstName`, `lastName`, `dob`
+Required fields: `firstName`, `lastName`, `dob`, `grade`
 
 ## Deployment
 
