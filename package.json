@@ -1,0 +1,11 @@
+{
+  "name": "wmi-result",
+  "version": "1.0.0",
+  "description": "WMI Student Results & Certificate Portal",
+  "scripts": {
+    "start": "live-server ."
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}

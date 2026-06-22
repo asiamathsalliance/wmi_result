@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WMI — Student Results & Certificate</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="text/javascript">
+  (function() {
+    emailjs.init({ publicKey: "siCnhr_d1sVgXtjyO" });
+  })();
+</script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <a href="#hero" class="nav-logo">
+    <img src="logo-images/wmi-logo.png" alt="WMI Logo">
+    <span class="nav-logo-text">WMI</span>
+  </a>
+
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#certificate">Results</a></li>
+      <li><a href="#contact" class="nav-contact">Contact Us</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="math-bg">
+    <div class="math-symbol s1">&sum;</div>
+    <div class="math-symbol s2">&pi;</div>
+    <div class="math-symbol s3">&infin;</div>
+    <div class="math-symbol s4">&radic;</div>
+    <div class="math-symbol s5">&int;</div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-badge">Official Student Portal</div>
+    <img class="hero-logo" src="logo-images/wmi-logo.png" alt="WMI Logo">
+    <h1 class="hero-title">
+      World <span>Mathematics</span><br>Invitational
+    </h1>
+    <p class="hero-subtitle">
+      The first international math competition founded in Taiwan —<br>
+      bringing together champions from over 38 countries and 30,000+ students worldwide.
+    </p>
+    <div class="hero-buttons">
+      <a href="#about" class="btn btn-secondary">Learn More</a>
+      <a href="#certificate" class="btn btn-primary">Download Certificate</a>
+    </div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat-item"><span class="stat-num">38+</span><span class="stat-label">Member Countries</span></div>
+    <div class="stat-item"><span class="stat-num">30K+</span><span class="stat-label">Students per Year</span></div>
+    <div class="stat-item"><span class="stat-num">2013</span><span class="stat-label">Founded</span></div>
+    <div class="stat-item"><span class="stat-num">K–12</span><span class="stat-label">All Grade Levels</span></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div>
+        <div class="section-eyebrow"><span class="eyebrow-line"></span> About WMI</div>
+        <h2 class="section-title">Math that goes beyond the textbook</h2>
+        <p class="section-body">
+          Founded in Taiwan in 2013, WMI is an international math competition that brings together students from 38+ countries and 30,000+ participants each year.
+        </p>
+        <br>
+        <a href="https://www.wminv.org" target="_blank" rel="noopener" class="btn btn-primary" style="display:inline-flex; margin-top:0.5rem;">Visit Official Site</a>
+      </div>
+      <div class="about-cards">
+        <div class="about-card accent">
+          <span class="card-icon">Global</span>
+          <div class="card-title">Global Reach</div>
+          <p class="card-desc">Students from 38+ countries compete and connect every year.</p>
+        </div>
+        <div class="about-card">
+          <span class="card-icon">All Ages</span>
+          <div class="card-title">All Ages Welcome</div>
+          <p class="card-desc">From kindergarten through senior high school — everyone can join.</p>
+        </div>
+        <div class="about-card">
+          <span class="card-icon">Fair</span>
+          <div class="card-title">Fair &amp; Open</div>
+          <p class="card-desc">Papers graded by coaches from multiple countries for impartiality.</p>
+        </div>
+        <div class="about-card">
+          <span class="card-icon">Creative</span>
+          <div class="card-title">Creative Problems</div>
+          <p class="card-desc">Questions designed to be innovative — no inside-the-box thinking here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATE -->
+<section id="certificate">
+  <div class="section-inner cert-section">
+    <div class="cert-header">
+      <div class="section-eyebrow" style="justify-content:center;"><span class="eyebrow-line"></span> Student Results <span class="eyebrow-line"></span></div>
+      <h2 class="section-title">Download Your Certificate</h2>
+      <p class="section-body cert-subtext">
+        Enter your registration details to retrieve your official WMI result. Your certificate will be available as a downloadable PDF.
+      </p>
+    </div>
+
+    <div class="cert-cta">
+      <button type="button" class="btn btn-primary btn-cert-find" id="open-cert-modal">Find Your Certificate</button>
+    </div>
+
+    <div class="cert-info-row">
+      <div class="info-card">
+        <div class="info-icon">Info</div>
+        <div class="info-text">
+          <h4>What you'll need</h4>
+          <p>Your first name, last name, and date of birth as registered with your school or WMI member organization.</p>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">Secure</div>
+        <div class="info-text">
+          <h4>Secure &amp; Official</h4>
+          <p>All certificates are digitally verified and issued by the WMI Organizing Committee via your local host agency.</p>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">Help</div>
+        <div class="info-text">
+          <h4>Can't find your result?</h4>
+          <p><a href="#contact">Contact us</a> for assistance with your certificate or registration details.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <div style="margin-bottom:3rem;">
+      <div class="section-eyebrow"><span class="eyebrow-line"></span> Get in Touch</div>
+      <h2 class="section-title">Contact Us</h2>
+      <p class="section-body">Have a question about your result, registration, or the competition? We're here to help.</p>
+    </div>
+
+    <div class="contact-grid">
+      <form class="contact-form" id="contact-form" novalidate>
+        <div class="contact-form-row">
+          <div class="contact-field">
+            <label for="c-name">Full Name</label>
+            <input type="text" id="c-name" placeholder="Your full name" required>
+          </div>
+          <div class="contact-field">
+            <label for="c-email">Email Address</label>
+            <input type="email" id="c-email" placeholder="you@email.com" required>
+          </div>
+        </div>
+        <div class="contact-field">
+          <label for="c-category">Topic</label>
+          <select id="c-category" required>
+            <option value="">Select a topic…</option>
+            <option value="Certificate not found">Certificate not found</option>
+            <option value="Registration">Registration</option>
+            <option value="General inquiry">General inquiry</option>
+          </select>
+        </div>
+        <div class="contact-field">
+          <label for="c-msg">Message</label>
+          <textarea id="c-msg" placeholder="Describe your question or issue…" required></textarea>
+        </div>
+        <button type="button" class="btn-send" id="contact-submit">Send Message</button>
+      </form>
+
+      <div class="contact-details">
+        <div class="contact-item">
+          <div class="contact-item-label">Host</div>
+          <div>
+            <h4>Asia Maths Alliance Pte Ltd</h4>
+            <p>Your official WMI host agency for Singapore, Indonesia &amp; the region.<br>
+            Phone: +65 9168 3007<br>
+            Email: <a href="mailto:asiamaths@gmail.com">asiamaths@gmail.com</a><br>
+            Web: <a href="https://asiamathsalliance.com" target="_blank" rel="noopener">asiamathsalliance.com</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-label">Intl</div>
+          <div>
+            <h4>WMI International Committee</h4>
+            <p>For general competition inquiries and official results.<br>
+            Web: <a href="https://www.wminv.org" target="_blank" rel="noopener">wminv.org</a></p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-label">Social</div>
+          <div>
+            <h4>Follow WMI</h4>
+            <p><a href="https://www.facebook.com/WMI-239698086644267/" target="_blank" rel="noopener">Facebook — WMI Official Page</a><br>
+            Stay updated on results, events &amp; new competitions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="logo-images/wmi-logo.png" alt="WMI Logo">
+      <span class="footer-logo-text">World Mathematics Invitational</span>
+    </div>
+    <p style="color:rgba(255,255,255,0.4); font-size:0.78rem;">Hosted in Singapore by <strong style="color:rgba(255,255,255,0.6);">Asia Maths Alliance Pte Ltd</strong> · One of 38+ global WMI member agencies</p>
+    <div class="footer-links">
+      <a href="https://www.wminv.org/Subpage/Members.aspx" target="_blank" rel="noopener">Members</a>
+      <a href="https://www.wminv.org/Subpage/GeneralInfomation.aspx" target="_blank" rel="noopener">Competition Info</a>
+      <a href="https://www.wminv.org/Subpage/Winners_2025.aspx" target="_blank" rel="noopener">Winners</a>
+      <a href="https://asiamathsalliance.com" target="_blank" rel="noopener">Asia Maths Alliance</a>
+      <a href="https://www.facebook.com/WMI-239698086644267/" target="_blank" rel="noopener">Facebook</a>
+    </div>
+    <p>Copyright &copy; World Mathematics Invitational Organizing Committee</p>
+  </div>
+</footer>
+
+<!-- Certificate lookup modal -->
+<div id="certModal" class="modal-overlay">
+  <div class="modal-box cert-modal-box">
+    <button type="button" class="modal-close" id="close-cert-modal" aria-label="Close">&times;</button>
+    <h3>Find Your Certificate</h3>
+    <p class="modal-desc">Fill in your details exactly as registered during enrollment.</p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="first-name">First Name</label>
+        <input type="text" id="first-name" placeholder="e.g. Ahmad" autocomplete="given-name">
+      </div>
+      <div class="form-group">
+        <label for="last-name">Last Name</label>
+        <input type="text" id="last-name" placeholder="e.g. Pratama" autocomplete="family-name">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dob">Date of Birth</label>
+      <input type="date" id="dob" autocomplete="bday">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="year">Year</label>
+        <select id="year">
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+          <option value="2022">2022</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="grade">Grade / Level</label>
+        <select id="grade">
+          <option value="">Select grade…</option>
+          <option>Kindergarten</option>
+          <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+          <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+          <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
+          <option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="button" class="btn-download" id="lookup-btn">Find My Certificate</button>
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay2">
+  <div class="spinner"></div>
+</div>
+
+<!-- Progress overlay (contact + download) -->
+<div id="downloadOverlay">
+  <div id="downloadContainer">
+    <p id="downloadLabel">Processing…</p>
+    <div class="progress-track">
+      <div id="downloadBar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Error modal -->
+<div id="errorModal">
+  <div class="error-box">
+    <h3>Notice</h3>
+    <p id="errorText"></p>
+    <button type="button" id="closeError">OK</button>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
