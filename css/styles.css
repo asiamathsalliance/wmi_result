@@ -144,28 +144,57 @@ nav {
   min-height: 640px;
   padding-top: 68px;
   box-sizing: border-box;
-  background: linear-gradient(145deg, var(--navy) 0%, var(--navy-light) 60%, #1e3a5f 100%);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
 }
 
-.math-bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: url('../hero-images/hero-background.png') center center / cover no-repeat;
+  z-index: 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    145deg,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.62) 45%,
+    rgba(0, 0, 0, 0.68) 100%
+  );
+  z-index: 1;
+}
+
+.math-bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
 
 .math-symbol {
   position: absolute;
   font-family: 'Fredoka One', cursive;
-  color: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.07);
   font-size: 6rem;
   user-select: none;
+  animation: math-wiggle 5s ease-in-out infinite;
+  transform-origin: center center;
 }
 
-.s1 { top: 5%; left: 3%; font-size: 8rem; }
-.s2 { top: 15%; right: 5%; font-size: 5rem; }
-.s3 { bottom: 10%; left: 8%; font-size: 7rem; }
-.s4 { bottom: 20%; right: 3%; font-size: 9rem; }
-.s5 { top: 40%; left: 40%; font-size: 5rem; opacity: 0.03; }
+@keyframes math-wiggle {
+  0%, 100% { transform: rotate(-5deg) translateY(0); }
+  25% { transform: rotate(4deg) translateY(-4px); }
+  50% { transform: rotate(-3deg) translateY(3px); }
+  75% { transform: rotate(6deg) translateY(-2px); }
+}
+
+.s1 { top: 5%; left: 3%; font-size: 8rem; animation-duration: 6s; animation-delay: 0s; }
+.s2 { top: 15%; right: 5%; font-size: 5rem; animation-duration: 4.5s; animation-delay: -1.2s; }
+.s3 { bottom: 10%; left: 8%; font-size: 7rem; animation-duration: 5.5s; animation-delay: -2s; }
+.s4 { bottom: 20%; right: 3%; font-size: 9rem; animation-duration: 7s; animation-delay: -0.8s; }
+.s5 { top: 40%; left: 40%; font-size: 5rem; opacity: 0.05; animation-duration: 4.8s; animation-delay: -1.5s; }
+.s6 { top: 6%; right: 2%; font-size: 6.5rem; animation-duration: 5.2s; animation-delay: -0.5s; }
+.s7 { bottom: 6%; right: 4%; font-size: 7rem; animation-duration: 6.2s; animation-delay: -2.5s; }
 
 .hero-inner {
   flex: 1;
@@ -179,7 +208,7 @@ nav {
   padding: 5rem 2rem 5.5rem;
   text-align: center;
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 .hero-badge {
